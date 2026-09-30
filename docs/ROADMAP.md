@@ -154,6 +154,16 @@ Phi-3.5-mini-instruct 답변 생성
 4. 동일한 문서 검색 및 RAG 답변 수행
 5. 답변 음성화는 후속 단계에서 검토
 
+## 버전별 진행 보고서
+
+구현 과정은 `docs/REPORT_vX.Y.Z_*.md` 형식으로 기록합니다.
+
+- [v0.1.0 Phi 기본 추론](REPORT_v0.1.0_phi-inference.md)
+- [v0.2.0 대화형 CLI](REPORT_v0.2.0_interactive-cli.md)
+- [v0.3.0 문서 로더](REPORT_v0.3.0_document-loader.md)
+
+각 보고서는 목표, 구현 내용, 실행 방법, 확인 항목, 제한사항, 다음 계획을 포함합니다.
+
 ## GitHub 기록 원칙
 
 각 단계가 끝날 때 다음 항목을 기록합니다.
@@ -183,8 +193,11 @@ feat: add web ui
 - [x] 로컬 저장소와 GitHub 원격 저장소 연결
 - [ ] 개발 환경 확인
 - [x] 기본 프로젝트 구조 생성
-- [ ] Phi-3.5-mini-instruct 모델 실행 코드 작성 및 실제 추론 확인
-- [ ] 문서 수집 및 전처리
+- [x] Phi-3.5-mini-instruct 모델 실행 코드 작성
+- [ ] Phi-3.5-mini-instruct 실제 추론 확인
+- [x] 대화형 CLI 인터페이스 구현
+- [x] 문서 로더 및 텍스트 추출 코드 작성
+- [ ] 문서 수집 및 실제 파일 테스트
 - [ ] 문서 Chunk 및 임베딩
 - [ ] 벡터 검색
 - [ ] RAG 답변 생성
