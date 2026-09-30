@@ -161,6 +161,9 @@ Phi-3.5-mini-instruct 답변 생성
 - [v0.1.0 Phi 기본 추론](REPORT_v0.1.0_phi-inference.md)
 - [v0.2.0 대화형 CLI](REPORT_v0.2.0_interactive-cli.md)
 - [v0.3.0 문서 로더](REPORT_v0.3.0_document-loader.md)
+- [v0.4.0 Chunk 및 BGE-M3 임베딩](REPORT_v0.4.0_chunking-embedding.md)
+- [v0.5.0 FAISS 벡터 검색](REPORT_v0.5.0_vector-search.md)
+- [v0.6.0 RAG 답변 생성](REPORT_v0.6.0_rag-generation.md)
 
 각 보고서는 목표, 구현 내용, 실행 방법, 확인 항목, 제한사항, 다음 계획을 포함합니다.
 
@@ -198,9 +201,12 @@ feat: add web ui
 - [x] 대화형 CLI 인터페이스 구현
 - [x] 문서 로더 및 텍스트 추출 코드 작성
 - [ ] 문서 수집 및 실제 파일 테스트
-- [ ] 문서 Chunk 및 임베딩
-- [ ] 벡터 검색
-- [ ] RAG 답변 생성
+- [x] 문서 Chunk 및 임베딩 코드 작성
+- [ ] 실제 문서 임베딩 및 인덱스 생성 확인
+- [x] 벡터 검색 코드 작성
+- [ ] 실제 인덱스 Top-k 검색 확인
+- [x] RAG 답변 생성 코드 작성
+- [ ] 실제 문서 기반 RAG 답변 확인
 - [ ] API 및 UI
 - [ ] 평가
 - [ ] 배포

@@ -64,7 +64,12 @@ chatbot_01/
 ├── app/
 │   ├── config.py          # 환경 설정
 │   ├── model_loader.py    # Phi 모델 로딩
-│   └── inference.py       # 단일/대화형 추론
+│   ├── inference.py       # 단일/대화형 추론
+│   ├── document_loader.py # 문서 텍스트 추출
+│   ├── chunking.py        # 문서 Chunk 분할
+│   ├── embedding.py       # BGE-M3 및 FAISS 인덱스
+│   ├── vector_search.py   # FAISS Top-k 검색
+│   └── rag.py             # 검색 결과 기반 답변
 ├── data/
 │   ├── raw/               # 원본 문서, Git 제외
 │   └── processed/         # 전처리 결과, Git 제외
@@ -72,11 +77,17 @@ chatbot_01/
 │   ├── ROADMAP.md         # 전체 로드맵
 │   ├── REPORT_v0.1.0_phi-inference.md
 │   ├── REPORT_v0.2.0_interactive-cli.md
-│   └── REPORT_v0.3.0_document-loader.md
+│   ├── REPORT_v0.3.0_document-loader.md
+│   ├── REPORT_v0.4.0_chunking-embedding.md
+│   ├── REPORT_v0.5.0_vector-search.md
+│   └── REPORT_v0.6.0_rag-generation.md
 ├── scripts/
 │   ├── test_phi_model.py       # 단일 질문 테스트
 │   ├── chat_cli.py             # 대화형 CLI
-│   └── test_document_loader.py # 문서 로더 테스트
+│   ├── test_document_loader.py # 문서 로더 테스트
+│   ├── build_embeddings.py     # 임베딩 인덱스 생성
+│   ├── search_cli.py           # 벡터 검색 테스트
+│   └── rag_cli.py              # RAG 답변 테스트
 ├── tests/
 ├── requirements.txt
 └── README.md
@@ -132,6 +143,46 @@ python -m scripts.test_document_loader
 
 지원 형식은 TXT, Markdown, PDF, DOCX, HTML입니다. PDF는 페이지별로 출처 메타데이터를 보존합니다.
 
+### BGE-M3 임베딩 및 FAISS 인덱스 생성
+
+문서 로더 테스트가 끝나면 문서를 Chunk로 분할하고 BGE-M3 임베딩을 생성합니다.
+
+```bash
+python -m scripts.build_embeddings
+```
+
+VRAM 사용량을 줄이려면 Batch를 낮춥니다.
+
+```bash
+python -m scripts.build_embeddings --batch-size 2
+```
+
+생성 결과는 `vectorstore/`에 저장되며 Git에는 커밋하지 않습니다.
+
+### 벡터 검색 테스트
+
+생성된 인덱스에서 질문과 유사한 문서 Chunk를 검색합니다.
+
+```bash
+python -m scripts.search_cli "휴가 신청 절차는 무엇인가요?"
+```
+
+검색 결과 수와 최소 유사도 점수도 지정할 수 있습니다.
+
+```bash
+python -m scripts.search_cli "휴가 신청 절차는 무엇인가요?" --top-k 5 --min-score 0.3
+```
+
+### 문서 기반 RAG 답변
+
+FAISS 검색 결과를 Phi-3.5-mini-instruct에 Context로 전달합니다.
+
+```bash
+python -m scripts.rag_cli "휴가 신청 절차는 무엇인가요?"
+```
+
+답변과 함께 참조 문서 및 검색 점수가 출력됩니다. 10GB VRAM을 고려해 RAG 검색 단계의 BGE-M3는 CPU에서 실행하고 GPU 메모리는 Phi 모델에 우선 사용합니다.
+
 ## Hugging Face 인증
 
 공개 모델은 인증 없이 다운로드될 수 있지만 안정적인 접근을 위해 Read 권한 토큰 사용을 권장합니다.
@@ -148,6 +199,8 @@ hf auth whoami
 
 - 전체 계획: [docs/ROADMAP.md](docs/ROADMAP.md)
 - 버전별 보고서: [docs/](docs/)
+  - [v0.5.0 벡터 검색](docs/REPORT_v0.5.0_vector-search.md)
+  - [v0.6.0 RAG 답변 생성](docs/REPORT_v0.6.0_rag-generation.md)
 
 주요 계획은 문서 처리, BGE-M3 임베딩, 벡터 검색, RAG 답변, Streamlit UI, FastAPI API, Whisper 음성 입력 순서로 진행합니다.
 

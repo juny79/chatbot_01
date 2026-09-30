@@ -21,6 +21,7 @@ faiss-cpu>=1.8.0
 openai-whisper
 soundfile>=0.12.1
 
-# Configuration and development
+# UI, configuration, and development
+streamlit>=1.36.0
 python-dotenv>=1.0.0
 pytest>=8.0.0
