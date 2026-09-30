@@ -25,6 +25,7 @@ class PhiInference:
         self,
         question: str,
         history: Sequence[dict[str, str]] | None = None,
+        system_prompt: str | None = None,
     ) -> str:
         if not question.strip():
             raise ValueError("질문은 비어 있을 수 없습니다.")
@@ -33,7 +34,8 @@ class PhiInference:
         messages = [
             {
                 "role": "system",
-                "content": "당신은 정확하고 간결하게 답변하는 한국어 FAQ 도우미입니다.",
+                "content": system_prompt
+                or "당신은 정확하고 간결하게 답변하는 한국어 FAQ 도우미입니다.",
             }
         ]
         if history:
