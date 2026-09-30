@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Sequence
+
 import torch
 
 from app.config import settings
@@ -19,7 +21,11 @@ class PhiInference:
         if self.model is None or self.tokenizer is None:
             self.tokenizer, self.model = load_phi_model()
 
-    def generate(self, question: str) -> str:
+    def generate(
+        self,
+        question: str,
+        history: Sequence[dict[str, str]] | None = None,
+    ) -> str:
         if not question.strip():
             raise ValueError("질문은 비어 있을 수 없습니다.")
 
@@ -28,9 +34,11 @@ class PhiInference:
             {
                 "role": "system",
                 "content": "당신은 정확하고 간결하게 답변하는 한국어 FAQ 도우미입니다.",
-            },
-            {"role": "user", "content": question.strip()},
+            }
         ]
+        if history:
+            messages.extend(history[-6:])
+        messages.append({"role": "user", "content": question.strip()})
         prompt = self.tokenizer.apply_chat_template(
             messages,
             tokenize=False,
