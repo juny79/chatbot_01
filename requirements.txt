@@ -8,6 +8,11 @@ sentencepiece>=0.2.0
 # 8-bit/4-bit loading on NVIDIA CUDA
 bitsandbytes>=0.43.0
 
+# Document loading and preprocessing
+pypdf>=4.0.0
+python-docx>=1.1.0
+beautifulsoup4>=4.12.0
+
 # Embeddings and vector search
 sentence-transformers>=3.0.0
 faiss-cpu>=1.8.0
