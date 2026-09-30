@@ -183,7 +183,7 @@ feat: add web ui
 - [x] 로컬 저장소와 GitHub 원격 저장소 연결
 - [ ] 개발 환경 확인
 - [x] 기본 프로젝트 구조 생성
-- [ ] Phi-3.5-mini-instruct 모델 실행
+- [ ] Phi-3.5-mini-instruct 모델 실행 코드 작성 및 실제 추론 확인
 - [ ] 문서 수집 및 전처리
 - [ ] 문서 Chunk 및 임베딩
 - [ ] 벡터 검색

@@ -12,8 +12,26 @@
 
 ## 진행 상태
 
-- 프로젝트 기본 구조 및 모델 설정 준비
-- 다음 단계: Phi-3.5-mini-instruct 단일 질문 추론 테스트
+- Phi-3.5-mini-instruct 기본 추론 코드 작성
+- 다음 단계: 환경 설치 후 단일 질문 추론 실행 및 VRAM 확인
+
+## Phi 기본 추론 실행
+
+가상환경을 활성화하고 패키지를 설치한 뒤 실행합니다.
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+python scripts/test_phi_model.py
+```
+
+질문을 직접 지정할 수도 있습니다.
+
+```bash
+python scripts/test_phi_model.py "휴가 신청 절차를 알려주세요."
+```
+
+첫 실행에서는 모델 가중치를 Hugging Face에서 다운로드합니다. 10GB VRAM 환경에서는 기본적으로 8비트 로딩과 입력 2,048 토큰, 생성 256 토큰 제한을 사용합니다.
 
 상세한 계획은 [docs/ROADMAP.md](docs/ROADMAP.md)를 참고하세요.
 
