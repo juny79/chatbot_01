@@ -1,0 +1,21 @@
+# Core inference
+transformers>=4.43.0,<5.0.0
+accelerate>=0.30.0
+torch>=2.2.0
+safetensors>=0.4.0
+sentencepiece>=0.2.0
+
+# 8-bit/4-bit loading on NVIDIA CUDA
+bitsandbytes>=0.43.0
+
+# Embeddings and vector search
+sentence-transformers>=3.0.0
+faiss-cpu>=1.8.0
+
+# Audio transcription
+openai-whisper
+soundfile>=0.12.1
+
+# Configuration and development
+python-dotenv>=1.0.0
+pytest>=8.0.0
