@@ -207,6 +207,7 @@ feat: add web ui
 - [ ] 실제 인덱스 Top-k 검색 확인
 - [x] RAG 답변 생성 코드 작성
 - [ ] 실제 문서 기반 RAG 답변 확인
-- [ ] API 및 UI
+- [x] API 및 UI 코드 작성
+- [ ] API 및 UI 실제 실행 확인
 - [ ] 평가
 - [ ] 배포

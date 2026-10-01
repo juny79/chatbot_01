@@ -69,7 +69,9 @@ chatbot_01/
 │   ├── chunking.py        # 문서 Chunk 분할
 │   ├── embedding.py       # BGE-M3 및 FAISS 인덱스
 │   ├── vector_search.py   # FAISS Top-k 검색
-│   └── rag.py             # 검색 결과 기반 답변
+│   ├── rag.py             # 검색 결과 기반 답변
+│   ├── api.py             # FastAPI 질문 응답 API
+│   └── web_ui.py          # Streamlit 웹 UI
 ├── data/
 │   ├── raw/               # 원본 문서, Git 제외
 │   └── processed/         # 전처리 결과, Git 제외
@@ -182,6 +184,33 @@ python -m scripts.rag_cli "휴가 신청 절차는 무엇인가요?"
 ```
 
 답변과 함께 참조 문서 및 검색 점수가 출력됩니다. 10GB VRAM을 고려해 RAG 검색 단계의 BGE-M3는 CPU에서 실행하고 GPU 메모리는 Phi 모델에 우선 사용합니다.
+
+### FastAPI 실행
+
+먼저 문서를 넣고 FAISS 인덱스를 생성한 뒤 API 서버를 실행합니다.
+
+```bash
+uvicorn app.api:app --host 0.0.0.0 --port 8000
+```
+
+헬스 체크와 질문 요청 예시는 다음과 같습니다.
+
+```bash
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/ask \\
+  -H "Content-Type: application/json" \\
+  -d '{"question":"휴가 신청 절차는 무엇인가요?","top_k":3,"min_score":0.3}'
+```
+
+`POST /ask`는 생성된 답변과 함께 `source`, `page`, `score`, `text`를 반환합니다. 인덱스가 없으면 `503`을 반환하므로 먼저 `scripts.build_embeddings` 또는 Streamlit 문서 관리 기능을 실행해야 합니다.
+
+### Streamlit 웹 UI
+
+```bash
+streamlit run app/web_ui.py
+```
+
+웹 UI의 사이드바에서 PDF, DOCX, TXT, Markdown, HTML 문서를 업로드하고 인덱스를 생성할 수 있습니다.
 
 ## Hugging Face 인증
 
