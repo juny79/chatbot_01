@@ -107,6 +107,13 @@ def main() -> None:
                     st.error(f"인덱스 생성에 실패했습니다: {error}")
 
         st.divider()
+        if index_exists and st.button("답변 모델 미리 준비", use_container_width=True):
+            with st.spinner("Phi 답변 모델을 메모리에 준비하는 중입니다..."):
+                try:
+                    get_rag_service().generator.load()
+                    st.success("답변 모델 준비가 완료되었습니다.")
+                except Exception as error:
+                    st.error(f"답변 모델 준비에 실패했습니다: {error}")
         if st.button("대화 초기화", use_container_width=True):
             st.session_state.messages = []
             st.rerun()
