@@ -17,8 +17,9 @@ class Settings:
     )
     device: str = os.getenv("DEVICE", "auto")
     max_input_tokens: int = int(os.getenv("MAX_INPUT_TOKENS", "2048"))
-    max_new_tokens: int = int(os.getenv("MAX_NEW_TOKENS", "256"))
-    temperature: float = float(os.getenv("TEMPERATURE", "0.2"))
+    max_new_tokens: int = int(os.getenv("MAX_NEW_TOKENS", "160"))
+    max_context_chars: int = int(os.getenv("MAX_CONTEXT_CHARS", "6000"))
+    temperature: float = float(os.getenv("TEMPERATURE", "0.1"))
     load_in_8bit: bool = os.getenv("LOAD_IN_8BIT", "true").lower() == "true"
 
 

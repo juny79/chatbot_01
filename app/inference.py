@@ -65,8 +65,8 @@ class PhiInference:
             output = self.model.generate(
                 **inputs,
                 max_new_tokens=settings.max_new_tokens,
-                do_sample=settings.temperature > 0,
-                temperature=max(settings.temperature, 0.01),
+                # Deterministic decoding is more reliable for document-grounded FAQ answers.
+                do_sample=False,
                 pad_token_id=self.tokenizer.pad_token_id,
                 eos_token_id=self.tokenizer.eos_token_id,
             )

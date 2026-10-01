@@ -34,7 +34,12 @@ def split_document(
     if chunk_size <= 0 or chunk_overlap < 0 or chunk_overlap >= chunk_size:
         raise ValueError("chunk_size는 양수이고 chunk_overlap은 chunk_size보다 작아야 합니다.")
 
-    text = " ".join(document.text.split())
+
+    # Keep line boundaries so Markdown tables, headings, and flow descriptions
+    # remain interpretable after extraction.
+    text = "\n".join(
+        line.strip() for line in document.text.splitlines() if line.strip()
+    )
     chunks: list[DocumentChunk] = []
     start = 0
     chunk_id = 0

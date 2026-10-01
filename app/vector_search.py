@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,6 +20,20 @@ class SearchResult:
     file_type: str
     page: int | None
     chunk_id: int
+
+
+_TOKEN_PATTERN = re.compile(r"[가-힣A-Za-z0-9_]+")
+
+
+def _tokens(text: str) -> set[str]:
+    return {token.lower() for token in _TOKEN_PATTERN.findall(text) if len(token) > 1}
+
+
+def _keyword_score(query_tokens: set[str], text: str) -> float:
+    if not query_tokens:
+        return 0.0
+    text_tokens = _tokens(text)
+    return len(query_tokens & text_tokens) / len(query_tokens)
 
 
 class VectorSearcher:
@@ -46,21 +61,32 @@ class VectorSearcher:
         if top_k <= 0:
             raise ValueError("top_k는 1 이상이어야 합니다.")
 
+        # Retrieve a wider semantic candidate set, then promote exact project IDs,
+        # system names, and other terms that vector similarity can under-rank.
+        candidate_k = min(max(top_k * 4, 20), self.index.ntotal)
         vector = self.embedder.encode([query.strip()])
-        scores, indices = self.index.search(vector, min(top_k, self.index.ntotal))
-        results: list[SearchResult] = []
-        for score, index in zip(scores[0], indices[0]):
-            if index < 0 or float(score) < min_score:
+        scores, indices = self.index.search(vector, candidate_k)
+        query_tokens = _tokens(query)
+        ranked: list[tuple[float, SearchResult]] = []
+        for semantic_score, index in zip(scores[0], indices[0]):
+            semantic = float(semantic_score)
+            if index < 0 or semantic < min_score:
                 continue
             item = self.metadata[int(index)]
-            results.append(
-                SearchResult(
-                    score=float(score),
-                    text=item["text"],
-                    source=item["source"],
-                    file_type=item["file_type"],
-                    page=item.get("page"),
-                    chunk_id=int(item["chunk_id"]),
+            lexical = _keyword_score(query_tokens, item["text"])
+            combined = semantic * 0.75 + lexical * 0.25
+            ranked.append(
+                (
+                    combined,
+                    SearchResult(
+                        score=combined,
+                        text=item["text"],
+                        source=item["source"],
+                        file_type=item["file_type"],
+                        page=item.get("page"),
+                        chunk_id=int(item["chunk_id"]),
+                    ),
                 )
             )
-        return results
+        ranked.sort(key=lambda item: item[0], reverse=True)
+        return [result for _, result in ranked[:top_k]]

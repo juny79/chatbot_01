@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+import pdfplumber
 from docx import Document as DocxDocument
 from pypdf import PdfReader
 
@@ -32,6 +33,45 @@ def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace").strip()
 
 
+def _table_to_markdown(table: list[list[str | None]]) -> str:
+    rows = [
+        [" ".join((cell or "").split()) for cell in row]
+        for row in table
+        if any((cell or "").strip() for cell in row)
+    ]
+    if not rows:
+        return ""
+    width = max(len(row) for row in rows)
+    rows = [row + [""] * (width - len(row)) for row in rows]
+    header = rows[0]
+    separator = ["---"] * width
+    lines = [
+        "| " + " | ".join(header) + " |",
+        "| " + " | ".join(separator) + " |",
+    ]
+    lines.extend("| " + " | ".join(row) + " |" for row in rows[1:])
+    return "\n".join(lines)
+
+
+def _extract_pdf_tables(path: Path) -> dict[int, list[str]]:
+    """Extract tables by page and keep their row/column structure as Markdown."""
+    tables_by_page: dict[int, list[str]] = {}
+    try:
+        with pdfplumber.open(str(path)) as pdf:
+            for page_number, page in enumerate(pdf.pages, start=1):
+                tables = []
+                for table in page.extract_tables() or []:
+                    markdown = _table_to_markdown(table)
+                    if markdown:
+                        tables.append(markdown)
+                if tables:
+                    tables_by_page[page_number] = tables
+    except Exception:
+        # A malformed or image-only PDF should still be loadable through pypdf/OCR later.
+        return {}
+    return tables_by_page
+
+
 def load_document(path: str | Path) -> list[LoadedDocument]:
     """Load one supported file into one or more source-aware records."""
     file_path = Path(path)
@@ -47,8 +87,16 @@ def load_document(path: str | Path) -> list[LoadedDocument]:
 
     if suffix == ".pdf":
         documents: list[LoadedDocument] = []
+        tables_by_page = _extract_pdf_tables(file_path)
         for page_number, page in enumerate(PdfReader(str(file_path)).pages, start=1):
             text = (page.extract_text() or "").strip()
+            tables = tables_by_page.get(page_number, [])
+            if tables:
+                text = "\n\n".join(
+                    part
+                    for part in [text, "[표\n" + "\n\n".join(tables) + "\n표]"]
+                    if part
+                )
             if text:
                 documents.append(LoadedDocument(text, source, "pdf", page_number))
         return documents
